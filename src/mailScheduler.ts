@@ -1,5 +1,7 @@
 import { DateTime } from "luxon";
 import { pool } from "./db";
+import { User } from "./types";
+import { PoolClient } from "pg";
 
 function utcConvert(dateNow: DateTime, date: Date | string, timezone: string, targetYear?: number) {
     // handle different date input formats more robustly
@@ -54,7 +56,7 @@ function utcConvert(dateNow: DateTime, date: Date | string, timezone: string, ta
     return nextMailDate;
 }
 
-export async function scheduleNextMailJob(user: any, client?: any) {
+export async function scheduleNextMailJob(user: User, client?: PoolClient) {
     const dbClient = client || pool;
     const now = DateTime.utc();
     // birthday -----
@@ -72,17 +74,17 @@ export async function scheduleNextMailJob(user: any, client?: any) {
 
     
     // insert outbox row (check for existing first)
-    // const existingJob = await dbClient.query(
-    //     `SELECT id FROM outbox 
-    //      WHERE user_id = $1 AND event_type = $2 AND scheduled_time = $3 AND status = 'pending'`,
-    //     [user.id, "birthday", nextBirthday.toJSDate()]
-    // );
+    const existingJob = await dbClient.query(
+        `SELECT id FROM outbox 
+         WHERE user_id = $1 AND event_type = $2 AND scheduled_time = $3 AND status = 'pending'`,
+        [user.id, "birthday", nextBirthday.toJSDate()]
+    );
 
-    // if (existingJob.rows.length === 0) {
+    if (existingJob.rows.length === 0) {
         await dbClient.query(
             `INSERT INTO outbox (user_id, event_type, scheduled_time, status)
              VALUES ($1, $2, $3, 'pending')`,
             [user.id, "birthday", nextBirthday.toJSDate()]
         );
-    // }
+    }
 }

@@ -13,7 +13,12 @@ describe('Mail Scheduler', () => {
                 timezone: 'Asia/Jakarta',
             }, false);
 
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1 AND event_type = $2',
@@ -36,7 +41,12 @@ describe('Mail Scheduler', () => {
                 timezone: 'Asia/Jakarta',
             }, false);
 
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1 AND event_type = $2',
@@ -56,7 +66,12 @@ describe('Mail Scheduler', () => {
                 timezone: 'Asia/Jakarta',
             }, false);
 
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1',
@@ -87,7 +102,12 @@ describe('Mail Scheduler', () => {
                 timezone: 'America/New_York',
             }, false);
 
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1',
@@ -117,8 +137,13 @@ describe('Mail Scheduler', () => {
             }, false);
 
             // schedule the same job twice
-            await scheduleNextMailJob(user, testPool);
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1 AND event_type = $2',
@@ -135,7 +160,12 @@ describe('Mail Scheduler', () => {
                 timezone: 'Asia/Jakarta',
             }, false);
 
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1',
@@ -158,7 +188,12 @@ describe('Mail Scheduler', () => {
                 timezone: 'Asia/Jakarta',
             }, false);
 
-            await scheduleNextMailJob(user, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(user, client);
+            } finally {
+                client.release();
+            }
 
             const { rows } = await testPool.query(
                 'SELECT * FROM outbox WHERE user_id = $1',

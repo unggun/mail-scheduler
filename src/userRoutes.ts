@@ -1,6 +1,8 @@
 import express from "express";
 import { pool } from "./db";
 import { scheduleNextMailJob } from "./mailScheduler";
+import { User } from "./types";
+import { PoolClient } from "pg";
 
 const router = express.Router();
 
@@ -27,7 +29,7 @@ router.post("/user", async (req, res) => {
     );
     const user = result.rows[0];
 
-    await scheduleNextMailJob(user, pool);
+    await scheduleNextMailJob(user as User, pool as unknown as PoolClient);
 
     res.json(user);
 });
@@ -56,7 +58,7 @@ router.put("/user/:id", async (req, res) => {
     await pool.query("DELETE FROM outbox WHERE user_id = $1", [id]);
 
     // Reschedule mail job
-    await scheduleNextMailJob(user, pool);
+    await scheduleNextMailJob(user as User, pool as unknown as PoolClient);
 
     res.json(user);
 });

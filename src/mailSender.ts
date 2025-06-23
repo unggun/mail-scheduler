@@ -1,6 +1,7 @@
 import axios from "axios";
+import { User } from "./types";
 
-export async function sendEmail(user: any, eventType: string) {
+export async function sendEmail(user: User, eventType: string) {
     const url = "https://email-service.digitalenvision.com.au/send-email";
     let message = "";
 

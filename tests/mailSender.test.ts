@@ -1,9 +1,23 @@
 import axios from 'axios';
 import { sendEmail } from '../src/mailSender';
 import { createTestUser } from './setup';
+import { User } from '../src/types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+// Helper function to create complete user objects for testing
+const createCompleteUser = (overrides: Partial<User> = {}): User => ({
+    id: 1,
+    first_name: 'John',
+    last_name: 'Doe',
+    email: 'john.doe@example.com',
+    birthday: new Date('1990-01-01'),
+    timezone: 'Asia/Jakarta',
+    created_at: new Date(),
+    updated_at: new Date(),
+    ...overrides,
+});
 
 describe('Mail Sender', () => {
     beforeEach(() => {
@@ -12,11 +26,7 @@ describe('Mail Sender', () => {
 
     describe('sendEmail', () => {
         it('should send birthday email successfully', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             const mockResponse = {
                 data: { status: 'sent', sentTime: '2024-01-15T09:00:00Z' },
@@ -41,11 +51,12 @@ describe('Mail Sender', () => {
         });
 
         it('should format birthday message correctly', async () => {
-            const user = {
+            const user = createCompleteUser({
+                id: 2,
                 first_name: 'Jane',
                 last_name: 'Smith',
                 email: 'jane.smith@example.com',
-            };
+            });
 
             const mockResponse = {
                 data: { status: 'sent' },
@@ -69,11 +80,7 @@ describe('Mail Sender', () => {
         });
 
         it('should throw error for invalid event type', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             await expect(sendEmail(user, 'invalid_event')).rejects.toThrow(
                 'Invalid event type: invalid_event'
@@ -83,11 +90,7 @@ describe('Mail Sender', () => {
         });
 
         it('should handle API timeout', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             const timeoutError = new Error('Timeout');
             timeoutError.name = 'ECONNABORTED';
@@ -103,11 +106,7 @@ describe('Mail Sender', () => {
         });
 
         it('should handle API server errors', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             const serverError = {
                 response: {
@@ -122,11 +121,7 @@ describe('Mail Sender', () => {
         });
 
         it('should handle network errors', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             const networkError = new Error('Network Error');
             mockedAxios.post.mockRejectedValueOnce(networkError);
@@ -135,11 +130,7 @@ describe('Mail Sender', () => {
         });
 
         it('should log request payload and response', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             const mockResponse = {
                 data: { status: 'sent', sentTime: '2024-01-15T09:00:00Z' },
@@ -172,11 +163,11 @@ describe('Mail Sender', () => {
         });
 
         it('should handle special characters in names', async () => {
-            const user = {
+            const user = createCompleteUser({
                 first_name: 'José',
                 last_name: 'García-López',
                 email: 'jose.garcia@example.com',
-            };
+            });
 
             const mockResponse = {
                 data: { status: 'sent' },
@@ -200,11 +191,7 @@ describe('Mail Sender', () => {
         });
 
         it('should use correct timeout value', async () => {
-            const user = {
-                first_name: 'John',
-                last_name: 'Doe',
-                email: 'john.doe@example.com',
-            };
+            const user = createCompleteUser();
 
             const mockResponse = {
                 data: { status: 'sent' },
