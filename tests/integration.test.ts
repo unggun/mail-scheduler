@@ -109,7 +109,12 @@ describe('Integration Tests', () => {
                 timezone: 'Asia/Jakarta'
             }, false);
 
-            await scheduleNextMailJob(createdUser, testPool);
+            const client = await testPool.connect();
+            try {
+                await scheduleNextMailJob(createdUser, client);
+            } finally {
+                client.release();
+            }
 
             // verify outbox entry was created
             const { rows: outboxRows } = await testPool.query(

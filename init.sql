@@ -26,8 +26,7 @@ CREATE TABLE IF NOT EXISTS outbox (
 
 -- unique constraint to prevent duplicate scheduled messages
 CREATE UNIQUE INDEX IF NOT EXISTS idx_outbox_unique_schedule 
-ON outbox (user_id, event_type, scheduled_time) 
-WHERE status = 'pending';
+ON outbox (user_id, event_type, scheduled_time);
 
 
 -- indexes for faster read
